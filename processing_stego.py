@@ -2,7 +2,11 @@ import numpy as np
 from scipy import stats
 from PIL import Image
 from math import floor, sqrt
-
+import sys
+import os
+from PIL import Image, ImageDraw
+from cryptography.fernet import Fernet
+from colorama import Fore, Style
 
 def chi_squared_test(channel):
     hist = calc_colors(channel)
@@ -327,13 +331,290 @@ def solve(groups):
 
     return x2 / (x2 - 0.5)
 
+
+def encrypt(path_to_image, text, key, balance):
+    """
+    Encrypt in image
+    :param path_to_image: path
+    :param text: text from data file
+    :param key: generated key
+    :param balance: 1 to 4
+    :return:
+    """
+    img = dict()
+    size = dict()
+    coord = dict()
+
+    img["image"] = Image.open(path_to_image)
+    img["draw"] = ImageDraw.Draw(img["image"])
+    img["pix"] = img["image"].load()
+
+    size["width"] = img["image"].size[0]
+    size["height"] = img["image"].size[1]
+
+    # text = des_encrypt(text, key)
+    text = text
+    binary_text = text_to_binary(text)
+    list_two = split_count(''.join(binary_text), balance)
+
+    coord["x"] = 0
+    coord["y"] = 0
+    count = 0
+
+    for i in list_two:
+        red, green, blue, = img["pix"][coord["x"], coord["y"]]
+
+        (red, green, blue) = balance_channel([red, green, blue], i)
+
+        img["draw"].point((coord["x"], coord["y"]), (red, green, blue))
+
+        if coord["x"] < (size["width"] - 1):
+            coord["x"] += 1
+
+        elif coord["y"] < (size["height"] - 1):
+            coord["y"] += 1
+            coord["x"] = 0
+
+        else:
+            error("Message too long for this image.", True)
+
+        count += 1
+
+    img["image"].save("out.png", "PNG")
+
+    file = open("key.dat", "w")
+    file.write(str(balance) + '$' + str(count) + '$' + "key")
+    file.close()
+
+
+def decrypt(path_to_image, key):
+    """
+
+    :param path_to_image:
+    :param key:
+    :return:
+    """
+    balance = int(key.split('$')[0])
+    count = int(key.split('$')[1])
+    end_key = key.split('$')[2]
+
+    img = dict()
+    coord = dict()
+
+    img["image"] = Image.open(path_to_image)
+    img["width"] = img["image"].size[0]
+    img["height"] = img["image"].size[1]
+    img["pix"] = img["image"].load()
+
+    coord["x"] = 0
+    coord["y"] = 0
+    code = ''
+
+    i = 0
+    while i < count:
+        pixels = img["pix"][coord["x"], coord["y"]]
+
+        pixel = str(bin(max(pixels)))
+
+        if balance == 4:
+            code += pixel[-4] + pixel[-3] + pixel[-2] + pixel[-1]
+
+        elif balance == 3:
+            code += pixel[-3] + pixel[-2] + pixel[-1]
+
+        elif balance == 2:
+            code += pixel[-2] + pixel[-1]
+
+        else:
+            code += pixel[-1]
+
+        if coord["x"] < (img["width"] - 1):
+            coord["x"] += 1
+        else:
+            coord["y"] += 1
+            coord["x"] = 0
+
+        i += 1
+
+    outed = binary_to_text(split_count(code, 8))
+
+
+    str1=""
+    for item in outed:
+        print(item)
+        str1+=item
+    return str1
+
+
+
+
+
+
+def split_count(text, count):
+    """
+    Splitting every count
+    :param text:
+    :param count:
+    :return:
+    """
+    result = list()
+    txt = ''
+    var = 0
+
+    for i in text:
+        if var == count:
+            result.append(txt)
+            txt = ''
+            var = 0
+
+        txt += i
+        var += 1
+
+    result.append(txt)
+
+    return result
+
+
+def last_replace(main_string, last_symbols):
+    """
+    Replace string with substring, starting from the end
+    :param main_string: пиздец
+    :param last_symbols: бля
+    :return: пизбля
+    """
+    return str(main_string)[:-len(last_symbols)] + last_symbols
+
+def text_to_binary(event):
+    """
+    Text convert to binary code
+    :param event: text
+    :return: binary code(str)
+    """
+    return ['0' * (8 - len(format(ord(elem), 'b'))) + format(ord(elem), 'b') for elem in event]
+
+
+def binary_to_text(event):
+    """
+    Binary code convert to text
+    :param event: binary code(str)
+    :return: text
+    """
+    return [chr(int(str(elem), 2)) for elem in event]
+
+
+def isset(array, key):
+    """
+    Сheck for the existence of a key in an list/dict
+    :param array: dict or list
+    :param key: key in dict/list
+    :return: boolean
+    """
+    try:
+        if type(array) is list:
+            array[key]
+
+        elif type(array) is dict:
+            return key in array.keys()
+
+        return True
+    except:
+        return False
+
+
+def error(text, quit=False):
+    """
+    Print a customized error
+    :param text: error text
+    """
+    print(Style.BRIGHT + Fore.YELLOW + "     " + text + Style.RESET_ALL)
+
+    if quit:
+        sys.exit()
+
+
+def using(text, quit=False):
+    """
+    Print a customized using message
+    :param text: using message
+    """
+    print(Style.BRIGHT + Fore.WHITE + "     " + text + Style.RESET_ALL)
+
+    if quit:
+        sys.exit()
+
+
+def success(text):
+    """
+    Print a customized successful message
+    :param text: success message
+    """
+    print(Style.BRIGHT + Fore.GREEN + "     " + text + Style.RESET_ALL)
+
+
+def find_max_index(array):
+    """
+    Find max number and return its index
+    :param array: input array
+    :return: max element index
+    """
+    max_num = array[0]
+    index = 0
+
+    for i, val in enumerate(array):
+        if val > max_num:
+            max_num = val
+            index = i
+
+    return index
+
+
+def balance_channel(colors, pix):
+    """
+    Find an optimal channel to write data
+    :param colors: red, green and blue channels
+    :param pix: data to write
+    :return: modified colors array
+    """
+    max_color = find_max_index(colors)
+    colors[max_color] = int(last_replace(bin(colors[max_color]), pix), 2)
+
+    while True:
+        max_sec = find_max_index(colors)
+        if max_sec != max_color:
+            colors[max_sec] = colors[max_color] - 1
+        else:
+            break
+
+    return colors
+
+def encode(fileName, text, balance=1):
+    # balance 1..4
+    encrypt(fileName, text.strip(), Fernet.generate_key().decode(), balance)
+
         
 if __name__ == "__main__":
-    img_fileName = "d://st/a1.png" 
-
-    visual_attack(Image.open(img_fileName))
-    # chi_squared_attack(Image.open("a1.png"))
-    z=spa_test(Image.open(img_fileName))
-    print(z)
-    z=rs_test(Image.open(img_fileName))
-    print(z)
+    img_fileName = "d://ml/a1.png" 
+    text = '1111111111111111111111111!'
+    with open("data.txt", "r", encoding='utf-8') as file:
+            text = file.read()
+    text = text.encode('cp1251').decode('cp1251')
+    print(text)
+    # with open("data.txt", "r", encoding='utf-8') as file:
+    #     text = file.read()
+    
+    # visual_attack(Image.open(img_fileName))
+    # # chi_squared_attack(Image.open("a1.png"))
+    # z=spa_test(Image.open(img_fileName))
+    # print(z)
+    # z=rs_test(Image.open(img_fileName))
+    # print(z)
+    
+    encode(img_fileName, text)
+    key=""
+    with open("key.dat", "r", encoding='utf-8') as file:
+        key = file.read()
+    s=decrypt("out.png", key)
+    # with open("out.txt", "w", encoding='cp1251') as file:
+    #     file.write(s)
+    # s=s.encode('cp1251')
+    print(s)
