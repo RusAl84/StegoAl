@@ -1,17 +1,10 @@
 import numpy as np
 from scipy import stats
 from PIL import Image
-from math import sqrt
+from math import floor, sqrt
+
 
 def chi_squared_test(channel):
-    """Main function for the attack
-
-    Using chi-squared implementation
-    from scipy.
-
-    :param channel: Channel for analyzing 
-
-    """
     hist = calc_colors(channel)
     expected_freq, observed_freq = calc_freq(hist)
     chis, probs = cs(observed_freq, expected_freq) 
@@ -41,20 +34,6 @@ def calc_freq(histogram):
 
 
 def visual_attack(img, join=False, bitnum=1):
-    """Implementing a visual attack
-
-    Visual attack can be of two kinds.
-    In the first case, three images of channels with LSB 
-    are created, in the second, these three images are 
-    combined into one. Images are opened by means of 
-    the operating system.
-
-    :param img: Image for attack
-    :param join: Is it necessary to divide the image into channels
-    :param bitnum: How many LSBs need to take
-
-    """
-    # logging.info('Visualising lsb for '+ img.filename +' ...🌀')
     height, width = img.size
 
     if join == False:
@@ -101,21 +80,6 @@ def visual_attack(img, join=False, bitnum=1):
         img_ch.show()
 
 def chi_squared_attack( img, eps=1e-5):
-    """Implementing a chi-squared attack
-
-    Westfeld and Pfitzmann attack using chi-square test.
-    The paper describing this method can be found here:
-    http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.94.5975&rep=rep1&type=pdf 
-    The test is applied to each line, then the original image 
-    is colored in accordance with the result. 
-    A new image with a test result is saved in the current directory.
-
-
-    :param img: Image for attack
-    :param eps: Error value for probability  (default is 1e-5)
-    
-    """
-    # logging.info('Calculating chi_squared for '+ img.filename +' ...🌀')
     channels = img.split()
     width, height = img.size
 
@@ -143,10 +107,6 @@ def chi_squared_attack( img, eps=1e-5):
     result.show()
     
 def spa_test(img):
-    """Using the Sample pairs method
-    
-    :param img: Image name
-    """
     height, width = img.size
 
     if width % 2  == 1:
@@ -172,35 +132,23 @@ def spa_test(img):
     
     
 def analyze(pix, h, w, channel='r'):
-    """Container analysis for steganography
-
-    :param pix: Image pixels
-    :param h: Image height
-    :param w: Image width
-    :param channel: One of three possible RGB channels. Set 'r' for red, 'g' for green, 'b' for blue
-    """
     P = 0 
     X = 0 
     Y = 0 
     Z = 0
     W = 0
-
     for i in range(0, h - 1):
         for j in range(0, w - 1, 2):
             u = pix[i, j]
             v = pix[i + 1, j]
-
             if (u >> 1 == v >> 1) and ((v & 0x1) != (u & 0x1)):
                 W += 1
-
             if u == v:
                 Z += 1
-
             # if lsb(v) = 0 & u < v OR lsb(v) = 1 & u > v
             if (v == (v >> 1) << 1) and (u < v) or (v != (v >> 1) << 1) and (u > v):
                 X += 1
 
-            # vice versa
             if (v == (v >> 1) << 1) and (u > v) or (v != (v >> 1) << 1) and (u < v):
                 Y += 1
             
@@ -251,8 +199,7 @@ def analyze(pix, h, w, channel='r'):
 
     return x
 
-from PIL import Image
-from math import floor, sqrt
+
 
 def rs_test(img, bw=2, bh=2, mask=[1, 0, 0, 1]):
     height, width = img.size
