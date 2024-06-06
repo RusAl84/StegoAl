@@ -332,7 +332,7 @@ def solve(groups):
     return x2 / (x2 - 0.5)
 
 
-def encrypt(path_to_image, text, key, balance):
+def encrypt(path_to_image, text, key, balance, out_filename="out.png"):
     """
     Encrypt in image
     :param path_to_image: path
@@ -352,8 +352,7 @@ def encrypt(path_to_image, text, key, balance):
     size["width"] = img["image"].size[0]
     size["height"] = img["image"].size[1]
 
-    # text = des_encrypt(text, key)
-    text = text
+    text = des_encrypt(text, key)
     binary_text = text_to_binary(text)
     list_two = split_count(''.join(binary_text), balance)
 
@@ -362,7 +361,7 @@ def encrypt(path_to_image, text, key, balance):
     count = 0
 
     for i in list_two:
-        red, green, blue, = img["pix"][coord["x"], coord["y"]]
+        red, green, blue = img["pix"][coord["x"], coord["y"]]
 
         (red, green, blue) = balance_channel([red, green, blue], i)
 
@@ -380,11 +379,13 @@ def encrypt(path_to_image, text, key, balance):
 
         count += 1
 
-    img["image"].save("out.png", "PNG")
+    img["image"].save(out_filename, "PNG")
 
     file = open("key.dat", "w")
-    file.write(str(balance) + '$' + str(count) + '$' + "key")
+    file.write(str(balance) + '$' + str(count) + '$' + key)
     file.close()
+
+
 
 
 def decrypt(path_to_image, key):
@@ -437,17 +438,41 @@ def decrypt(path_to_image, key):
         i += 1
 
     outed = binary_to_text(split_count(code, 8))
+    str1=des_decrypt(''.join(outed), end_key)
+    # file = open("out.txt", "w")
+    # file.write(str1)
+    # file.close()
+    with open("out.txt", "w", encoding='utf-8') as file:
+        file.write(str1)
+    
+    
+    success("Data saved in out.txt")
 
 
-    str1=""
-    for item in outed:
-        print(item)
-        str1+=item
-    return str1
+def des_encrypt(text, key):
+    """
+    DES Encrypting
+    :param text:
+    :param key:
+    :return: encrypt data
+    """
+    cipher = Fernet(key.encode('utf-8'))
+    result = cipher.encrypt(text.encode('utf-8'))
+
+    return result.decode('utf-8')
 
 
+def des_decrypt(text, key):
+    """
+    DES Decrypting
+    :param text:
+    :param key:
+    :return:
+    """
+    cipher = Fernet(key.encode('utf-8'))
+    result = cipher.decrypt(text.encode('utf-8'))
 
-
+    return result.decode('utf-8')
 
 
 def split_count(text, count):
@@ -587,20 +612,17 @@ def balance_channel(colors, pix):
 
     return colors
 
-def encode(fileName, text, balance=1):
+def encode(fileName, out_filename, text, balance=1):
     # balance 1..4
-    encrypt(fileName, text.strip(), Fernet.generate_key().decode(), balance)
+    encrypt(fileName, text.strip(), Fernet.generate_key().decode(), balance, out_filename)
 
         
 if __name__ == "__main__":
-    img_fileName = "d://ml/a1.png" 
+    img_fileName = "d://ml/a1.png"
+    out_filename="d://ml/out.png" 
     text = '1111111111111111111111111!'
     with open("data.txt", "r", encoding='utf-8') as file:
             text = file.read()
-    text = text.encode('cp1251').decode('cp1251')
-    print(text)
-    # with open("data.txt", "r", encoding='utf-8') as file:
-    #     text = file.read()
     
     # visual_attack(Image.open(img_fileName))
     # # chi_squared_attack(Image.open("a1.png"))
@@ -609,12 +631,22 @@ if __name__ == "__main__":
     # z=rs_test(Image.open(img_fileName))
     # print(z)
     
-    encode(img_fileName, text)
+    encode(img_fileName, out_filename, text,4)
     key=""
     with open("key.dat", "r", encoding='utf-8') as file:
         key = file.read()
-    s=decrypt("out.png", key)
-    # with open("out.txt", "w", encoding='cp1251') as file:
-    #     file.write(s)
-    # s=s.encode('cp1251')
+    s=decrypt(out_filename, key)
     print(s)
+    
+    # visual_attack(Image.open(out_filename))
+    z=spa_test(Image.open(out_filename))
+    print(z)
+    z=rs_test(Image.open(out_filename))
+    print(z)
+    
+    img_fileName = "d://ml/a1.png" 
+    # visual_attack(Image.open(img_fileName))
+    z=spa_test(Image.open(img_fileName))
+    print(z)
+    z=rs_test(Image.open(img_fileName))
+    print(z)
