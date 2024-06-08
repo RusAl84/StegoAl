@@ -32,16 +32,19 @@ def uploadimg():
 def send_photo(path):
     return send_from_directory('uploads', path)
 
-@app.route("/stego_proc", methods=['GET'])
+@app.route("/stego_proc", methods=['POST'])
 def stego_proc():
     pass
     msg = request.json
     # print(msg)
     text = msg['text']
-    img_fileName = "http://localhost:5000/uploads/in.png"
-    out_filename = "http://localhost:5000/uploads/out.png"
+    img_fileName = "./uploads/in.png"
+    out_filename = "./uploads/out.png" 
+    print(text)
+    print(out_filename)
+
     processing_stego.encode(img_fileName, out_filename, text,4)
-    return "http://localhost:5000/uploads/key.dat"
+    return "http://localhost:5000/uploads/out.png"
 
 
 @app.route("/get_pattern_add", methods=['POST'])
