@@ -4,7 +4,7 @@ import os
 import time
 import urllib.request
 import processing_stego
-
+from flask import send_from_directory
 
 app = Flask(__name__)
 CORS(app)
@@ -18,7 +18,7 @@ def dafault_route():
 
 @app.route('/uploadimg', methods=['POST'])
 @cross_origin()
-def uploadae():
+def uploadimg():
     for fname in request.files:
         f = request.files.get(fname)
         print(f)
@@ -26,17 +26,22 @@ def uploadae():
         # filename = str(milliseconds)
         full_filename = f"./uploads/in.png"
         f.save(full_filename)
+    return "http://localhost:5000/uploads/in.png"
 
+@app.route('/uploads/<path:path>')
+def send_photo(path):
+    return send_from_directory('uploads', path)
 
-@app.route("/get_pattern", methods=['POST'])
-def get_pattern():
+@app.route("/stego_proc", methods=['GET'])
+def stego_proc():
     pass
-    # msg = request.json
+    msg = request.json
     # print(msg)
-    # data = process_nlp.get_pattern(msg['text'])
-    # data = process_nlp.add_print_text(data)
-    # print(data['print_text'])
-    # return data
+    text = msg['text']
+    img_fileName = "http://localhost:5000/uploads/in.png"
+    out_filename = "http://localhost:5000/uploads/out.png"
+    processing_stego.encode(img_fileName, out_filename, text,4)
+    return "http://localhost:5000/uploads/key.dat"
 
 
 @app.route("/get_pattern_add", methods=['POST'])
