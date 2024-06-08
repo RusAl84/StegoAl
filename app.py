@@ -16,7 +16,7 @@ def dafault_route():
     return 'API'
 
 
-@app.route('/uploadae', methods=['POST'])
+@app.route('/uploadimg', methods=['POST'])
 @cross_origin()
 def uploadae():
     for fname in request.files:
@@ -30,7 +30,8 @@ def uploadae():
 
 @app.route("/get_pattern", methods=['POST'])
 def get_pattern():
-    msg = request.json
+    pass
+    # msg = request.json
     # print(msg)
     # data = process_nlp.get_pattern(msg['text'])
     # data = process_nlp.add_print_text(data)
@@ -40,6 +41,7 @@ def get_pattern():
 
 @app.route("/get_pattern_add", methods=['POST'])
 def get_pattern_add():
+    pass
     # msg = request.json
     # print(msg)
     # data = process_nlp.add_data(msg['text'])
@@ -51,6 +53,7 @@ def get_pattern_add():
 
 @app.route('/findae', methods=['POST'])
 def findae():
+    pass
     #     if request.method == 'POST':
     # msg = request.json
     # print(msg)
@@ -67,14 +70,8 @@ def findae():
 
 @app.route("/clear_db", methods=['GET'])
 def clear_db():
-    process_nlp.clear_db()
     return "ok clear_db"
 
-
-@app.route("/load_db", methods=['GET'])
-def load_db():
-    data = process_nlp.load_db()
-    return data
 
 
 if __name__ == '__main__':

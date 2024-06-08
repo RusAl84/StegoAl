@@ -380,8 +380,7 @@ def encrypt(path_to_image, text, key, balance, out_filename="out.png"):
         count += 1
 
     img["image"].save(out_filename, "PNG")
-
-    file = open("key.dat", "w")
+    file = open("./uploads/key.dat", "w")
     file.write(str(balance) + '$' + str(count) + '$' + key)
     file.close()
 
@@ -618,8 +617,8 @@ def encode(fileName, out_filename, text, balance=1):
 
         
 if __name__ == "__main__":
-    img_fileName = "d://ml/a1.png"
-    out_filename="d://ml/out.png" 
+    img_fileName = "./uploads/in.png"
+    out_filename="./uploads/out.png" 
     text = '1111111111111111111111111!'
     with open("data.txt", "r", encoding='utf-8') as file:
             text = file.read()
@@ -633,7 +632,7 @@ if __name__ == "__main__":
     
     encode(img_fileName, out_filename, text,4)
     key=""
-    with open("key.dat", "r", encoding='utf-8') as file:
+    with open("./uploads/key.dat", "r", encoding='utf-8') as file:
         key = file.read()
     s=decrypt(out_filename, key)
     print(s)
