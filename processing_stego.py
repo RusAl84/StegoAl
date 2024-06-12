@@ -380,7 +380,7 @@ def encrypt(path_to_image, text, key, balance, out_filename="out.png"):
         count += 1
 
     img["image"].save(out_filename, "PNG")
-    file = open("./uploads/key.dat", "w")
+    file = open(os.getcwd()+"\\StegoAl\\uploads\\key.dat", "w")
     file.write(str(balance) + '$' + str(count) + '$' + key)
     file.close()
 
@@ -632,7 +632,7 @@ def expr0():
     
     encode(img_fileName, out_filename, text,4)
     key=""
-    with open("./uploads/key.dat", "r", encoding='utf-8') as file:
+    with open(os.getcwd()+"\\StegoAl\\uploads\\key.dat", "r", encoding='utf-8') as file:
         key = file.read()
     s=decrypt(out_filename, key)
     print(s)
@@ -663,19 +663,65 @@ def expr1():
     img_fileName = "./uploads/a2.png"
     out_filename="./uploads/out.png" 
     ast=[]
-    art=[]
+    ars=[]
     for i in range(10):
         print(i)
         text=gen_data(i)
         out_filename=f"./uploads/out_{i}.png"
         encode(img_fileName, out_filename, text,4)
         st=spa_test(Image.open(out_filename))
-        rt=rs_test(Image.open(out_filename))
+        rs=rs_test(Image.open(out_filename))
         ast.append(st)
-        art.append(rt)  #1111!!!!
+        ars.append(rs)  
     print(ast)
-    print(art)
+    print(ars)
+    
+
+
+def stego_reseach():
+    #Определение размера контейнера в зависимости от конкретного изображения
+    img_fileName = os.getcwd()+"\\StegoAl\\uploads\\a3.png"
+    out_filename = os.getcwd()+"\\StegoAl\\uploads\\out.png" 
+    data_filename = os.getcwd()+"\\StegoAl\\data1.txt"
+    def gen_data(size, filename):
+        with open(filename, "r", encoding='utf-8') as file:
+            text = file.read()
+        all_text = ""
+        for i in range(size):
+            all_text += text
+        return all_text
+    msz1=os.path.getsize(data_filename)
+    img_sz=os.path.getsize(img_fileName)
+    ast=[]
+    ars=[]
+    asz=[]
+    amsz=[]
+    adif=[]
+    acomp=[]
+    for i in range(11):
+        print(i)
+        text=gen_data(i,data_filename)
+        out_filename=os.getcwd()+f"\\StegoAl\\uploads\\out_{i}.png"
+        encode(img_fileName, out_filename, text,4)
+        st=spa_test(Image.open(out_filename))
+        rs=rs_test(Image.open(out_filename))
+        sz=os.path.getsize(out_filename)
+        dif=img_sz-sz
+        msz=msz1*i
+        comp=msz/dif
+        ast.append(st)      # spa_test
+        ars.append(rs)      # rs_test
+        asz.append(sz)      # количество данных в изображении (байт) (С)
+        amsz.append(msz)    # количество данных (байт) (размер сообщения)
+        adif.append(dif)    # разность между исходным изобр и изобр со стего
+        acomp.append(comp)  # коэфф сжатия
+    print(ast)
+    print(ars)
+    print(asz)
+    print(amsz)
+    print(adif)
+    print(acomp)
     
         
 if __name__ == "__main__":
-    expr1()
+    stego_reseach()
