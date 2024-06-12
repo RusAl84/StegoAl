@@ -679,6 +679,8 @@ def expr1():
 
 
 def stego_reseach():
+    from matplotlib import pyplot as plt
+    import math
     #Определение размера контейнера в зависимости от конкретного изображения
     img_fileName = os.getcwd()+"\\StegoAl\\uploads\\a3.png"
     out_filename = os.getcwd()+"\\StegoAl\\uploads\\out.png" 
@@ -698,7 +700,9 @@ def stego_reseach():
     amsz=[]
     adif=[]
     acomp=[]
+    x=[]
     for i in range(11):
+    # for i in range(11):
         print(i)
         text=gen_data(i,data_filename)
         out_filename=os.getcwd()+f"\\StegoAl\\uploads\\out_{i}.png"
@@ -715,13 +719,53 @@ def stego_reseach():
         amsz.append(msz)    # количество данных (байт) (размер сообщения)
         adif.append(dif)    # разность между исходным изобр и изобр со стего
         acomp.append(comp)  # коэфф сжатия
-    print(ast)
-    print(ars)
-    print(asz)
-    print(amsz)
-    print(adif)
-    print(acomp)
+        x.append(i)
+    print(ast)   # spa_test
+    print(ars)   # rs_test
+    print(asz)   # количество данных в изображении (байт) (С)
+    print(amsz)  # количество данных (байт) (размер сообщения)
+    print(adif)  # разность между исходным изобр и изобр со стего
+    print(acomp) # коэфф сжатия
+    plt.plot(x, ast, color='g')
+    plt.xlabel('spa_test')
+    plt.savefig(os.getcwd()+f"\\StegoAl\\uploads\\ast.png") 
+    plt.clf()
+    plt.plot(x, ars, color='b')
+    plt.xlabel('rs_test')
+    plt.savefig(os.getcwd()+f"\\StegoAl\\uploads\\ars.png") 
+    plt.clf()
+    plt.plot(x, asz, color='r')
+    plt.xlabel('количество данных в изображении (байт) (С)')
+    plt.savefig(os.getcwd()+f"\\StegoAl\\uploads\\asz.png") 
+    plt.clf()
+    plt.plot(x, amsz, color='c')
+    plt.xlabel('количество данных (байт) (размер сообщения)')
+    plt.savefig(os.getcwd()+f"\\StegoAl\\uploads\\amsz.png") 
+    plt.clf()
+    plt.plot(x, adif, color='m')
+    plt.xlabel('разность между исходным изобр. и изобр. со стего.')
+    plt.savefig(os.getcwd()+f"\\StegoAl\\uploads\\adif.png")
+    plt.clf()
+    plt.plot(x, acomp, color='k')
+    plt.xlabel('коэффициент сжатия')
+    plt.savefig(os.getcwd()+f"\\StegoAl\\uploads\\acomp.png")
+    
+def plot_exp():
+    from matplotlib import pyplot as plt
+    import math
+    plt.figure()
+    x=[]
+    y=[]
+    for i in range(11):
+        print(i)
+        x.append(i)
+        y.append(math.sin(i))
+    
+    plt.plot(x, y)
+    plt.xlabel('x')
+    plt.show()    
     
         
 if __name__ == "__main__":
     stego_reseach()
+    #plot_exp()
