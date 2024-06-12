@@ -615,8 +615,8 @@ def encode(fileName, out_filename, text, balance=1):
     # balance 1..4
     encrypt(fileName, text.strip(), Fernet.generate_key().decode(), balance, out_filename)
 
-        
-if __name__ == "__main__":
+
+def expr0():
     img_fileName = "./uploads/in.png"
     out_filename="./uploads/out.png" 
     text = '1111111111111111111111111!'
@@ -649,3 +649,33 @@ if __name__ == "__main__":
     print(z)
     z=rs_test(Image.open(img_fileName))
     print(z)
+
+
+def gen_data(size):
+    with open("data10.txt", "r", encoding='utf-8') as file:
+        text = file.read()
+    all_text = ""
+    for i in range(size):
+        all_text += text
+    return all_text
+def expr1():
+    #Определение размера контейнера в зависимости от конкретного изображения
+    img_fileName = "./uploads/a2.png"
+    out_filename="./uploads/out.png" 
+    ast=[]
+    art=[]
+    for i in range(10):
+        print(i)
+        text=gen_data(i)
+        out_filename=f"./uploads/out_{i}.png"
+        encode(img_fileName, out_filename, text,4)
+        st=spa_test(Image.open(out_filename))
+        rt=rs_test(Image.open(out_filename))
+        ast.append(st)
+        art.append(rt)  #1111!!!!
+    print(ast)
+    print(art)
+    
+        
+if __name__ == "__main__":
+    expr1()
