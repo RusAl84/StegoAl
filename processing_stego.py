@@ -8,6 +8,8 @@ from PIL import Image, ImageDraw
 from cryptography.fernet import Fernet
 from colorama import Fore, Style
 
+a_path=os.getcwd()+'\\StegoAl\\'
+
 def chi_squared_test(channel):
     hist = calc_colors(channel)
     expected_freq, observed_freq = calc_freq(hist)
@@ -21,13 +23,11 @@ def cs(n, y):
     return stats.chisquare(n, z)
 
 def calc_colors(channel):
-    """Prepare color histogram for further calculations"""
     hist = channel.histogram()
     hist = list(map(lambda x: 1 if x == 0 else x, hist)) # to avoid dividing by zero 
     return hist
 
 def calc_freq(histogram):
-    """Calculating expacted and observed freqs"""
     expected = []
     observed = []
     for k in range(0, len(histogram) // 2):
@@ -39,12 +39,10 @@ def calc_freq(histogram):
 
 def visual_attack(img, join=False, bitnum=1):
     height, width = img.size
-
     if join == False:
         channels = img.split()
         colors = [(0, 0, 0), (0, 255, 0), (0, 0, 255)] # red, green, blue
         suffixes = ['red', 'green', 'blue']
-
         for k in range(3):
             channel = channels[k].load()
             img_ch = Image.new("RGB", (height, width), color=colors[k])
@@ -60,9 +58,7 @@ def visual_attack(img, join=False, bitnum=1):
                         else:
                             img_ch.putpixel((i, j), 0) # white
             name = "ggg.png"
-            # name = suffixes[k] + "-" + img.filename.split(".")[0] + ".bmp"
             img_ch.save(name)
-            # logging.info("Openning " + suffixes[k] + " component...🌀")
             img_ch.show()
     else:
         img_ch = Image.new("RGB", (height, width), color=(0, 0, 0))
@@ -333,14 +329,6 @@ def solve(groups):
 
 
 def encrypt(path_to_image, text, key, balance, out_filename="out.png"):
-    """
-    Encrypt in image
-    :param path_to_image: path
-    :param text: text from data file
-    :param key: generated key
-    :param balance: 1 to 4
-    :return:
-    """
     img = dict()
     size = dict()
     coord = dict()
@@ -380,7 +368,7 @@ def encrypt(path_to_image, text, key, balance, out_filename="out.png"):
         count += 1
 
     img["image"].save(out_filename, "PNG")
-    file = open(os.getcwd()+"\\StegoAl\\uploads\\key.dat", "w")
+    file = open(a_path+"uploads\\key.dat", "w")
     file.write(str(balance) + '$' + str(count) + '$' + key)
     file.close()
 
@@ -388,12 +376,6 @@ def encrypt(path_to_image, text, key, balance, out_filename="out.png"):
 
 
 def decrypt(path_to_image, key):
-    """
-
-    :param path_to_image:
-    :param key:
-    :return:
-    """
     balance = int(key.split('$')[0])
     count = int(key.split('$')[1])
     end_key = key.split('$')[2]
@@ -438,49 +420,25 @@ def decrypt(path_to_image, key):
 
     outed = binary_to_text(split_count(code, 8))
     str1=des_decrypt(''.join(outed), end_key)
-    # file = open("out.txt", "w")
-    # file.write(str1)
-    # file.close()
-    with open("out.txt", "w", encoding='utf-8') as file:
+
+    with open(a_path+"uploads\out.txt", "w", encoding='utf-8') as file:
         file.write(str1)
-    
-    
-    success("Data saved in out.txt")
+    return str1
 
 
 def des_encrypt(text, key):
-    """
-    DES Encrypting
-    :param text:
-    :param key:
-    :return: encrypt data
-    """
     cipher = Fernet(key.encode('utf-8'))
     result = cipher.encrypt(text.encode('utf-8'))
-
     return result.decode('utf-8')
 
 
 def des_decrypt(text, key):
-    """
-    DES Decrypting
-    :param text:
-    :param key:
-    :return:
-    """
     cipher = Fernet(key.encode('utf-8'))
     result = cipher.decrypt(text.encode('utf-8'))
-
     return result.decode('utf-8')
 
 
 def split_count(text, count):
-    """
-    Splitting every count
-    :param text:
-    :param count:
-    :return:
-    """
     result = list()
     txt = ''
     var = 0
@@ -495,44 +453,21 @@ def split_count(text, count):
         var += 1
 
     result.append(txt)
-
     return result
 
 
 def last_replace(main_string, last_symbols):
-    """
-    Replace string with substring, starting from the end
-    :param main_string: пиздец
-    :param last_symbols: бля
-    :return: пизбля
-    """
     return str(main_string)[:-len(last_symbols)] + last_symbols
 
 def text_to_binary(event):
-    """
-    Text convert to binary code
-    :param event: text
-    :return: binary code(str)
-    """
     return ['0' * (8 - len(format(ord(elem), 'b'))) + format(ord(elem), 'b') for elem in event]
 
 
 def binary_to_text(event):
-    """
-    Binary code convert to text
-    :param event: binary code(str)
-    :return: text
-    """
     return [chr(int(str(elem), 2)) for elem in event]
 
 
 def isset(array, key):
-    """
-    Сheck for the existence of a key in an list/dict
-    :param array: dict or list
-    :param key: key in dict/list
-    :return: boolean
-    """
     try:
         if type(array) is list:
             array[key]
@@ -546,10 +481,6 @@ def isset(array, key):
 
 
 def error(text, quit=False):
-    """
-    Print a customized error
-    :param text: error text
-    """
     print(Style.BRIGHT + Fore.YELLOW + "     " + text + Style.RESET_ALL)
 
     if quit:
@@ -557,10 +488,6 @@ def error(text, quit=False):
 
 
 def using(text, quit=False):
-    """
-    Print a customized using message
-    :param text: using message
-    """
     print(Style.BRIGHT + Fore.WHITE + "     " + text + Style.RESET_ALL)
 
     if quit:
@@ -568,19 +495,10 @@ def using(text, quit=False):
 
 
 def success(text):
-    """
-    Print a customized successful message
-    :param text: success message
-    """
     print(Style.BRIGHT + Fore.GREEN + "     " + text + Style.RESET_ALL)
 
 
 def find_max_index(array):
-    """
-    Find max number and return its index
-    :param array: input array
-    :return: max element index
-    """
     max_num = array[0]
     index = 0
 
@@ -593,12 +511,6 @@ def find_max_index(array):
 
 
 def balance_channel(colors, pix):
-    """
-    Find an optimal channel to write data
-    :param colors: red, green and blue channels
-    :param pix: data to write
-    :return: modified colors array
-    """
     max_color = find_max_index(colors)
     colors[max_color] = int(last_replace(bin(colors[max_color]), pix), 2)
 
@@ -612,15 +524,14 @@ def balance_channel(colors, pix):
     return colors
 
 def encode(fileName, out_filename, text, balance=1):
-    # balance 1..4
     encrypt(fileName, text.strip(), Fernet.generate_key().decode(), balance, out_filename)
 
 
 def expr0():
-    img_fileName = "./uploads/in.png"
-    out_filename="./uploads/out.png" 
+    img_fileName = a_path+"uploads\\in.png"
+    out_filename=a_path+"uploads\\out.png" 
     text = '1111111111111111111111111!'
-    with open("data.txt", "r", encoding='utf-8') as file:
+    with open(a_path+"data.txt", "r", encoding='utf-8') as file:
             text = file.read()
     
     # visual_attack(Image.open(img_fileName))
@@ -632,7 +543,7 @@ def expr0():
     
     encode(img_fileName, out_filename, text,4)
     key=""
-    with open(os.getcwd()+"\\StegoAl\\uploads\\key.dat", "r", encoding='utf-8') as file:
+    with open(a_path+"uploads\\key.dat", "r", encoding='utf-8') as file:
         key = file.read()
     s=decrypt(out_filename, key)
     print(s)
@@ -652,7 +563,7 @@ def expr0():
 
 
 def gen_data(size):
-    with open("data10.txt", "r", encoding='utf-8') as file:
+    with open(a_path+"data10.txt", "r", encoding='utf-8') as file:
         text = file.read()
     all_text = ""
     for i in range(size):
@@ -660,14 +571,14 @@ def gen_data(size):
     return all_text
 def expr1():
     #Определение размера контейнера в зависимости от конкретного изображения
-    img_fileName = "./uploads/a2.png"
-    out_filename="./uploads/out.png" 
+    img_fileName = a_path+"uploads/a2.png"
+    out_filename=a_path+"uploads/out.png" 
     ast=[]
     ars=[]
     for i in range(10):
         print(i)
         text=gen_data(i)
-        out_filename=f"./uploads/out_{i}.png"
+        out_filename=a_path+f"uploads\\out_{i}.png"
         encode(img_fileName, out_filename, text,4)
         st=spa_test(Image.open(out_filename))
         rs=rs_test(Image.open(out_filename))
@@ -682,9 +593,9 @@ def stego_reseach():
     from matplotlib import pyplot as plt
     import math
     #Определение размера контейнера в зависимости от конкретного изображения
-    img_fileName = os.getcwd()+"\\StegoAl\\uploads\\a3.png"
-    out_filename = os.getcwd()+"\\StegoAl\\uploads\\out.png" 
-    data_filename = os.getcwd()+"\\StegoAl\\data1.txt"
+    img_fileName =  a_path+"uploads\\a3.png"
+    out_filename =  a_path+"uploads\\out.png" 
+    data_filename = a_path+"data1.txt"
     def gen_data(size, filename):
         with open(filename, "r", encoding='utf-8') as file:
             text = file.read()
@@ -705,7 +616,7 @@ def stego_reseach():
     # for i in range(11):
         print(i)
         text=gen_data(i,data_filename)
-        out_filename=os.getcwd()+f"\\StegoAl\\uploads\\out_{i}.png"
+        out_filename=a_path+"uploads\\out_{i}.png"
         encode(img_fileName, out_filename, text,4)
         st=spa_test(Image.open(out_filename))
         rs=rs_test(Image.open(out_filename))
@@ -728,27 +639,27 @@ def stego_reseach():
     print(acomp) # коэфф сжатия
     plt.plot(x, ast, color='g')
     plt.xlabel('spa_test')
-    plt.savefig(os.getcwd()+f"\\StegoAl\\uploads\\ast.png") 
+    plt.savefig(a_path+"uploads\\ast.png") 
     plt.clf()
     plt.plot(x, ars, color='b')
     plt.xlabel('rs_test')
-    plt.savefig(os.getcwd()+f"\\StegoAl\\uploads\\ars.png") 
+    plt.savefig(a_path+"uploads\\ars.png") 
     plt.clf()
     plt.plot(x, asz, color='r')
     plt.xlabel('количество данных в изображении (байт) (С)')
-    plt.savefig(os.getcwd()+f"\\StegoAl\\uploads\\asz.png") 
+    plt.savefig(a_path+"uploads\\asz.png") 
     plt.clf()
     plt.plot(x, amsz, color='c')
     plt.xlabel('количество данных (байт) (размер сообщения)')
-    plt.savefig(os.getcwd()+f"\\StegoAl\\uploads\\amsz.png") 
+    plt.savefig(a_path+"uploads\\amsz.png") 
     plt.clf()
     plt.plot(x, adif, color='m')
     plt.xlabel('разность между исходным изобр. и изобр. со стего.')
-    plt.savefig(os.getcwd()+f"\\StegoAl\\uploads\\adif.png")
+    plt.savefig(a_path+"uploads\\adif.png")
     plt.clf()
     plt.plot(x, acomp, color='k')
     plt.xlabel('коэффициент сжатия')
-    plt.savefig(os.getcwd()+f"\\StegoAl\\uploads\\acomp.png")
+    plt.savefig(a_path+"uploads\\acomp.png")
     
 def plot_exp():
     from matplotlib import pyplot as plt
@@ -760,12 +671,11 @@ def plot_exp():
         print(i)
         x.append(i)
         y.append(math.sin(i))
-    
     plt.plot(x, y)
     plt.xlabel('x')
     plt.show()    
-    
+
         
 if __name__ == "__main__":
     stego_reseach()
-    #plot_exp()
+    # plot_exp()
