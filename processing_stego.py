@@ -369,6 +369,7 @@ def encrypt(path_to_image, text, key, balance, out_filename="out.png"):
         count += 1
 
     img["image"].save(out_filename, "PNG")
+
     file = open(a_path+"uploads\\key.dat", "w")
     file.write(str(balance) + '$' + str(count) + '$' + key)
     file.close()
@@ -527,6 +528,17 @@ def balance_channel(colors, pix):
 def encode(fileName, out_filename, text, balance=1):
     encrypt(fileName, text.strip(), Fernet.generate_key().decode(), balance, out_filename)
 
+def decode():
+    with open(a_path+"data.txt", "r", encoding='utf-8') as file:
+            text = file.read()
+    out_filename=a_path+"uploads\\out.png" 
+    key=""
+    with open(a_path+"uploads\\key.dat", "r", encoding='utf-8') as file:
+        key = file.read()
+    s=decrypt(out_filename, key)
+    print(s)
+    return s
+
 
 def expr0():
     img_fileName = a_path+"uploads\\in.png"
@@ -590,7 +602,7 @@ def expr1():
     
 
 
-def stego_reseach(img_fileName):
+def stego_reseach(img_fileName=a_path+"uploads\\a3.png"):
     from matplotlib import pyplot as plt
     import math
     #Определение размера контейнера в зависимости от конкретного изображения
@@ -614,7 +626,6 @@ def stego_reseach(img_fileName):
     acomp=[]
     x=[]
     for i in range(11):
-    # for i in range(11):
         print(i)
         text=gen_data(i,data_filename)
         out_filename=a_path+"uploads\\out_{i}.png"

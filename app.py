@@ -26,9 +26,25 @@ def uploadimg():
         print(f)
         # milliseconds = int(time.time() * 1000)
         # filename = str(milliseconds)
-        full_filename = f"./uploads/in.png"
-        f.save(full_filename)
-    return "http://localhost:5000/uploads/in.png"
+        in_filename = a_path + f"uploads\\in.png"
+        f.save(in_filename)
+        in_param=f"Загружено изображение размером {os.path.getsize(in_filename)} байт"
+        out_data={}
+        out_data['in_img_path']="http://localhost:5000/uploads/in.png"
+        out_data['in_param']=in_param
+    return out_data
+
+@app.route('/uploadkey', methods=['POST'])
+@cross_origin()
+def uploadkey():
+    for fname in request.files:
+        f = request.files.get(fname)
+        print(f)
+        # milliseconds = int(time.time() * 1000)
+        # filename = str(milliseconds)
+        in_filename = a_path + f"uploads\\key1.key"
+        f.save(in_filename)
+
 
 @app.route('/uploads/<path:path>')
 def send_photo(path):
@@ -44,44 +60,47 @@ def stego_proc():
     out_filename = a_path + "uploads\\out.png" 
     print(text)
     print(out_filename)
-
     processing_stego.encode(img_fileName, out_filename, text,4)
-    return "http://localhost:5000/uploads/out.png"
+    out_param=f"Получено изображение размером {os.path.getsize(out_filename)} байт"
+    out_data={}
+    out_data['out_img_path'] = "http://localhost:5000/uploads/out.png"
+    out_data['out_param'] = out_param
+    return out_data
 
 
-@app.route("/get_pattern_add", methods=['POST'])
-def get_pattern_add():
+@app.route("/stego_reseach", methods=['POST'])
+def stego_reseach():
     pass
-    # msg = request.json
-    # print(msg)
-    # data = process_nlp.add_data(msg['text'])
-    # data = process_nlp.add_print_text(data)
-    # print()
-    # print(data)
-    # return data
+    img_fileName = a_path + "uploads\\in.png"
+    out_filename = a_path + "uploads\\out.png" 
 
+    print(out_filename)
+    processing_stego.stego_reseach()
+    out_param=f"Получено изображение размером {os.path.getsize(out_filename)} байт"
+    out_data={}
+    out_data['ast'] = "http://localhost:5000/uploads/ast.png"
+    out_data['ars'] = "http://localhost:5000/uploads/ars.png"
+    out_data['asz'] = "http://localhost:5000/uploads/asz.png"
+    out_data['amsz'] = "http://localhost:5000/uploads/amsz.png"
+    out_data['adif'] = "http://localhost:5000/uploads/adif.png"
+    out_data['acomp'] = "http://localhost:5000/uploads/acomp.png"
+    return out_data
 
-@app.route('/findae', methods=['POST'])
-def findae():
+@app.route("/stego_decode", methods=['POST'])
+def stego_decode():
     pass
-    #     if request.method == 'POST':
-    # msg = request.json
-    # print(msg)
-    # filename = msg['filename']
-    # ttype=msg['type']
-    # # filename="d:/ml/chat/andromedica1.json"
-    # save_filename="./data_proc.json"
-    # # data_proc(filename, save_filename, 32)
-    # # find_cl(save_filename)
-    # data = process_nlp.find_type("./find_data.json", ttype)
-    # print(data)
-    # return data
+    img_fileName = a_path + "uploads\\in.png"
+    out_filename = a_path + "uploads\\out.png" 
+    print(out_filename)
+    str1 = processing_stego.decode()
+    out_data={}
+    out_data['decode'] = str1
+    return out_data
 
 
 @app.route("/clear_db", methods=['GET'])
 def clear_db():
     return "ok clear_db"
-
 
 
 if __name__ == '__main__':
