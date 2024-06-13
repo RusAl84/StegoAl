@@ -8,7 +8,8 @@ from PIL import Image, ImageDraw
 from cryptography.fernet import Fernet
 from colorama import Fore, Style
 
-a_path=os.getcwd()+'\\StegoAl\\'
+import config
+a_path=config.a_path
 
 def chi_squared_test(channel):
     hist = calc_colors(channel)
@@ -589,7 +590,7 @@ def expr1():
     
 
 
-def stego_reseach():
+def stego_reseach(img_fileName):
     from matplotlib import pyplot as plt
     import math
     #Определение размера контейнера в зависимости от конкретного изображения

@@ -5,6 +5,8 @@ import time
 import urllib.request
 import processing_stego
 from flask import send_from_directory
+import config
+a_path=config.a_path
 
 app = Flask(__name__)
 CORS(app)
@@ -38,8 +40,8 @@ def stego_proc():
     msg = request.json
     # print(msg)
     text = msg['text']
-    img_fileName = "./uploads/in.png"
-    out_filename = "./uploads/out.png" 
+    img_fileName = a_path + "uploads\\in.png"
+    out_filename = a_path + "uploads\\out.png" 
     print(text)
     print(out_filename)
 
