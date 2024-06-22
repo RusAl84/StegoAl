@@ -458,6 +458,7 @@ def split_count(text, count):
     return result
 
 
+
 def last_replace(main_string, last_symbols):
     return str(main_string)[:-len(last_symbols)] + last_symbols
 
